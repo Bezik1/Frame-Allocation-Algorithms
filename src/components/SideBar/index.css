@@ -1,0 +1,24 @@
+.side-bar {
+    position: fixed;
+    left: 0;
+    height: 100vh;
+    width: 8vw;
+    background: #1b1b1e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-ico {
+    transition: .5s;
+    cursor: pointer;
+    color: #9b9bff;
+    width: 70px;
+    height: 70px;
+}
+
+.chart-ico:hover {
+    color: #d0d0ff;
+    transform: translateY(-5px);
+}

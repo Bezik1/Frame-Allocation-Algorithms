@@ -1,0 +1,138 @@
+.info-container {
+    width: 39.5%;
+    height: 42vh;
+    padding: 40px;
+    padding-top: 0;
+    margin-left: 2.5vw;
+    background-color: #1b1b1e;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-content {
+    margin-top: 5%;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.info-lists {
+    width: 50%;
+    height: 45vh;
+    display: flex;
+    flex-direction: column;
+    gap: 20px   ;
+}
+
+.process-el {
+    padding-left: 10%;
+    padding-right: 10%;
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.process-el-value {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.page-faults {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    gap: 10px;
+    height: 23vh;
+    padding-right: 25px;
+}
+
+.global-page-fault {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    width: 70%;
+    padding: 5%;
+    padding-left: 10%;
+    padding-right: 10%;
+    border: 2px solid #d0d0ff;
+    font-size: 1.2em;
+}
+
+.page-fault {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #d0d0ff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.page-fault-count {
+    font-size: 1.2em;
+}
+
+.info-table {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-el {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.detailed-select {
+    text-align: center;
+    width: 92%;
+    padding: 5%;
+    padding-left: 10%;
+    padding-right: 10%;
+    background-color: transparent;
+    border: 2px solid #d0d0ff;
+    color: #d0d0ff;
+}
+
+.limited {
+    height: 86%;
+}
+.reset-history-btn {
+    transition: .5s;
+    cursor: pointer;
+    font-size: 1.2em;
+    text-align: center;
+    width: 92%;
+    padding: 5%;
+    padding-left: 10%;
+    padding-right: 10%;
+    background-color: transparent;
+    border: 2px solid #d0d0ff;
+    color: #d0d0ff;
+}
+
+.reset-history-btn:hover {
+    border: 2px solid #d0d0ff;;
+    transform: translateY(-5px);
+}
+
+.none {
+    color: #a6a6cb;
+    font-size: 1.5em;
+    width: 50%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

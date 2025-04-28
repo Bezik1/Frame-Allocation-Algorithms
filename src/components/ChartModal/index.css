@@ -1,0 +1,79 @@
+.chart-modal-backgroud {
+    z-index: 4;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0606067c;
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-modal {
+    width: 85vw;
+    height: 85vh;
+    margin-left: 5vw;
+    margin-bottom: 7vh;
+    background: #1b1b1e;
+    border-radius: 25px;
+}
+
+.navbar {
+    width: 98%;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding-right: 15px;
+}
+
+.close-ico {
+    color: #9b9bff;
+    transition: .5s;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+}
+
+.close-ico:hover {
+    color: #d0d0ff;
+    transform: translateY(-5px);
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.fade-out {
+    animation: fadeOut 0.4s ease-in;
+}
+
+.charts {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px;
+}

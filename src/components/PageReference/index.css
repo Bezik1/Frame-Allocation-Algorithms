@@ -1,0 +1,27 @@
+.page-reference {
+    width: 35vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.refs {
+    display: flex;
+    width: 19.6vw;
+    padding: 25px;
+    overflow-x: scroll;
+}
+
+.ref {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4em;
+    width: 45px;
+    height: 45px;
+    padding: 28px;
+    border: 1px solid #626287;
+    color: #d0d0ff;
+}
