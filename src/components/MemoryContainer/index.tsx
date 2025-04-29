@@ -21,7 +21,7 @@ const MemoryContainer = ({ children, memory, reference } : { children?: ReactNod
                 const intensity = (allocations[idx])/(reference.length)*255 //100 + (idx-allocations.length / 2 > 0 ? 1 : -1) * allocations[idx] * colorCoefficient
 
                 return (
-                        <div className="memory-cell" style={{ background:  /*(idx) > reference.length ? "transparent" :*/ `rgb(${intensity}, ${intensity}, 255)` }}>{
+                        <div className="memory-cell" style={{ background:  allocations.length == 0 ? 'transparent' :`rgb(${intensity}, ${intensity}, 255)` }}>{
                             value 
                                 ? value.address 
                                 : "x"

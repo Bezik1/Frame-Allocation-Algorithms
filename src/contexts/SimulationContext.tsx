@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { SimulationContextType } from "../types/contextTypes";
 import { Batch } from "../types/Batch";
-import { BASE_LOCALITY_WINDOW_SIZE, BASE_PROCESSES_COUNT, BASE_SIMULATION_SPEED, MAX_LOCALITY_PAGES, MIN_LOCALITY_PAGES } from "../const/pageSettings";
+import { BASE_LOCALITY_WINDOW_SIZE, BASE_PROCESSES_COUNT, BASE_SIMULATION_SPEED, BASE_MAX_LOCALITY_PAGES, BASE_MIN_LOCALITY_PAGES } from "../const/pageSettings";
 import { HistoryElement } from "../types/HistoryElement";
 import { EqualAllocation } from "../algorithms/FrameAllocationAlgorithms/EqualAllocation";
 import { FrameAllocationAlgorithm } from "../types/FrameAllocationAlgorithm";
@@ -10,9 +10,9 @@ const SimulationContext = createContext<SimulationContextType>({
     speed: BASE_SIMULATION_SPEED,
     localityWindowSize: BASE_LOCALITY_WINDOW_SIZE,
     setLocalityWindowSize: undefined,
-    minLocalPages: MIN_LOCALITY_PAGES,
+    minLocalPages: BASE_MAX_LOCALITY_PAGES,
     setMinLocalPages: undefined,
-    maxLocalPages: MAX_LOCALITY_PAGES,
+    maxLocalPages: BASE_MAX_LOCALITY_PAGES,
     setMaxLocalPages: undefined,
     setSpeed: undefined,
     batches: [],
@@ -36,8 +36,8 @@ export const SimulationProvider = ({ children } : { children?: ReactNode | React
     const [speed, setSpeed] = useState(BASE_SIMULATION_SPEED)
     const [history, setHistory] = useState<HistoryElement[]>([])
     const [localityWindowSize, setLocalityWindowSize] = useState(BASE_LOCALITY_WINDOW_SIZE)
-    const [minLocalPages, setMinLocalPages] = useState(MIN_LOCALITY_PAGES)
-    const [maxLocalPages, setMaxLocalPages] = useState(MAX_LOCALITY_PAGES)
+    const [minLocalPages, setMinLocalPages] = useState(BASE_MIN_LOCALITY_PAGES)
+    const [maxLocalPages, setMaxLocalPages] = useState(BASE_MAX_LOCALITY_PAGES)
     const [maxFrameCount, setMaxFrameCount] = useState(BASE_PROCESSES_COUNT)
     const [allocations, setAllocations] = useState<number[]>([])
 

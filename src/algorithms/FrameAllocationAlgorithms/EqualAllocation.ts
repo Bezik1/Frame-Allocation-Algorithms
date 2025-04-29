@@ -41,15 +41,15 @@ export const EqualAllocation: FrameAllocationAlgorithm =
             continue;
         }
 
-        const [updatedMemory, updatedReference] = LRU(newPage, subMemory, subReference, indexes[i]);
-        pageFaults[i] += subMemory.find(el => el && el.address == newPage.address) !== undefined ? 1 : 0
+        pageFaults[i] += subMemory.findIndex(el => el?.address == newPage.address) == -1 ? 1 : 0;
+        const [updatedMemory] = LRU(newPage, subMemory, [], indexes[i]);
 
         const newMemory = [...memory];
         newMemory.splice(start, framesPerProcess, ...updatedMemory.slice(0, framesPerProcess));
 
         memory = newMemory;
         
-        allocations.fill(i + 1, start, memoryIndex+1);
+        allocations.fill(i + 1, start, start+framesPerProcess);
 
         i++;
     }

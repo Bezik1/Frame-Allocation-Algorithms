@@ -13,10 +13,8 @@ export const ProportionalAllocation: FrameAllocationAlgorithm =
 
     const totalWeight = activeProcesses.reduce((acc, process) => acc + process.weight, 0);
 
-    const framesPerProcesses: number[] = processReference.map(process => 
-        (process.pages.length > 0) 
-          ? Math.max(1, Math.floor((process.weight / totalWeight) * memory.length))
-            : 0
+    const framesPerProcesses = processReference.map(process =>
+        process.pages.length > 0 ? Math.max(1, Math.floor((process.weight / totalWeight) * memory.length)) : 0
     );
 
     const pageFaults: number[] = new Array<number>(processReference.length).fill(0);
@@ -38,14 +36,14 @@ export const ProportionalAllocation: FrameAllocationAlgorithm =
         const start = memoryIndex;
         const end = start + framesAllocated;
 
-        const subMemory = memoryCopy.slice(start, end);
+        const subMemory = memory.slice(start, end);
         const subReference = process.pages.slice(0, framesAllocated);
 
         const newPage = process.pages.shift();
         if (!newPage) continue;
 
-        pageFaults[i] += subMemory.find(el => el && el.address == newPage.address) !== undefined ? 1 : 0
-        const [updatedMemory, updatedReference] = LRU(newPage, subMemory, subReference, indexes[i]);
+        pageFaults[i] += subMemory.findIndex(el => el?.address == newPage.address) == -1 ? 1 : 0;
+        const [updatedMemory] = LRU(newPage, subMemory, [], indexes[i]);
 
         for (let j = 0; j < framesAllocated && (start + j) < memoryCopy.length; j++) {
             memoryCopy[start + j] = updatedMemory[j];

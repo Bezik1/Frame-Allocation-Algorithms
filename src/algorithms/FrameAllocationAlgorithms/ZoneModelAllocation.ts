@@ -1,8 +1,6 @@
 import { FrameAllocationAlgorithm } from "../../types/FrameAllocationAlgorithm";
 import { LRU } from "../PageReplacementAlgorithms/LRU";
 
-const WINDOW_SIZE = 10;
-
 export const ZoneModelAllocation: FrameAllocationAlgorithm = (
     processReference,
     memory,
@@ -11,7 +9,27 @@ export const ZoneModelAllocation: FrameAllocationAlgorithm = (
     oldAllocations,
     workingSets,
 ) => {
+    const WINDOW_SIZE = 10;
     const activeProcesses = processReference.filter(p => p.pages.length > 0);
+    
+    if(oldAllocations.length === 0) {
+        const allocations = new Array<number>(memory.length).fill(0);
+        const numProcesses = activeProcesses.length;
+        const baseAllocation = Math.floor(memory.length / numProcesses);
+        let remainder = memory.length % numProcesses;
+    
+        let memIndex = 0;
+        activeProcesses.forEach(process => {
+            const allocationCount = baseAllocation + (remainder > 0 ? 1 : 0);
+            remainder--;
+    
+            for (let i = 0; i < allocationCount; i++) {
+                allocations[memIndex++] = process.id;
+            }
+        });
+    
+        oldAllocations.push(...allocations);
+    }
 
     if (activeProcesses.length === 0) {
         return [
@@ -24,80 +42,112 @@ export const ZoneModelAllocation: FrameAllocationAlgorithm = (
     const pageFaults = new Array<number>(processReference.length).fill(0);
     const memoryCopy = [...memory];
     const updatedAllocations = [...oldAllocations];
-    let memoryIndex = 0;
 
-    let potentialBackupSlots = 0;
-    let potentialDesiredSlots = 0;
-
-    processReference.forEach((process, i) => {
-        if (process.pages.length === 0) {
-            potentialBackupSlots += oldAllocations.reduce((state, el) => el == process.id ? state+1 : state, 0)
-            return;
-        };
-        const newPage = process.pages[0];
-
-        let isInWorkingSet = workingSets[i].includes(newPage.address);
-
-        if (workingSets[i].length < WINDOW_SIZE) {
-            workingSets[i].push(newPage.address);
-        } else if (!isInWorkingSet) {
-            workingSets[i].shift();
-            workingSets[i].push(newPage.address);
-        }
-
-        const allocatedFrames = oldAllocations.filter(id => id === process.id).length;
-        const subMemory = memoryCopy.slice(memoryIndex, memoryIndex + allocatedFrames);
-
-        if (isInWorkingSet && subMemory.some(page => page?.address === newPage.address) && allocatedFrames > 1) {
-            potentialBackupSlots++;
-        } else if (!isInWorkingSet) {
-            potentialDesiredSlots++;
-        }
-    });
-
-    let slotsToReplace = Math.max(potentialBackupSlots - potentialDesiredSlots, 0);
+    let potentialBackupSlots: number[] = [];
+    let potentialDesiredSlots: number[] = [];
 
     processReference.forEach((process, i) => {
         if (process.pages.length === 0) return;
-        const emptySlots = memoryCopy.reduce((sum, slot) => sum + (slot === undefined ? 1 : 0), 0);
-        
-        const prevAllocatedFrames = oldAllocations.filter(id => id === process.id).length;
-        const additionalSlot = slotsToReplace+emptySlots > 0 ? 1 : 0;
-        const allocatedFrames = Math.max(1, prevAllocatedFrames + additionalSlot);
-        if (slotsToReplace > 0) slotsToReplace--;
 
-        let goLeft = memoryIndex + allocatedFrames > memory.length;
-        let start = memoryIndex;
-        let end = goLeft ? Math.max(0, memoryIndex - allocatedFrames) : Math.min(memory.length, memoryIndex + allocatedFrames);
-        
-        let realStart = Math.min(start, end);
-        let realEnd = Math.max(start, end);
-        
-        let subMemory = memoryCopy.slice(realStart, realEnd);
+        const newPage = process.pages[0];
+        const isInWorkingSet = workingSets[i].includes(newPage.address);
 
-        if(allocatedFrames > 0) {
-            const newPage = process.pages.shift();
-            if (!newPage) return;
+        if (!isInWorkingSet) {
+            if (workingSets[i].length >= WINDOW_SIZE) {
+                workingSets[i].shift();
+            }
+            workingSets[i].push(newPage.address);
+        }
 
-            pageFaults[i] += subMemory.find(el => el && el.address == newPage.address) !== undefined ? 1 : 0
+        const subMemory = memoryCopy.filter((_, idx) => updatedAllocations[idx] === process.id);
 
-            const [updatedMemory] = LRU(newPage, subMemory, [], indexes[i]);
+        if (isInWorkingSet && subMemory.some(page => page?.address === newPage.address)) {
+            potentialBackupSlots.push(process.id);
+        } else if (!isInWorkingSet) {
+            potentialDesiredSlots.push(process.id);
+        }
+    });
 
-            if (!goLeft) {
-                for (let j = 0; j < updatedMemory.length && (realStart + j) < memoryCopy.length; j++) {
-                    memoryCopy[realStart + j] = updatedMemory[j];
-                    updatedAllocations[realStart + j] = process.id;
-                }
-            } else {
-                for (let j = 0; j < updatedMemory.length && (realEnd - 1 - j) >= 0; j++) {
-                    memoryCopy[realEnd - 1 - j] = updatedMemory[j];
-                    updatedAllocations[realEnd - 1 - j] = process.id;
-                }
+    let slotsToReplace = Math.min(potentialDesiredSlots.length, potentialBackupSlots.length);
+
+    processReference.forEach((process, i) => {
+        if (process.pages.length === 0) return;
+
+        const emptySlotIndex = memoryCopy.findIndex(slot => slot === undefined);
+        const prevAllocatedFrames = updatedAllocations.filter(id => id === process.id).length;
+
+        let addSlot = false;
+        if (slotsToReplace > 0 || emptySlotIndex !== -1) {
+            addSlot = true;
+        }
+
+        let allocatedFrames = prevAllocatedFrames + (addSlot ? 1 : 0);
+
+        if (addSlot && slotsToReplace > 0) slotsToReplace--;
+
+        if (addSlot) {
+            const currentDesiredIdx = potentialDesiredSlots.indexOf(process.id);
+            if (currentDesiredIdx !== -1) {
+                potentialDesiredSlots.splice(currentDesiredIdx, 1);
             }
 
-            memoryIndex = end;
-        } else throw new Error("Cannot execute process page if the allocated frame count is 0!")
+            const backupProcessId = potentialBackupSlots.shift();
+            if (backupProcessId !== undefined) {
+                const idx = updatedAllocations.findIndex(id => id === backupProcessId);
+                if (idx !== -1) updatedAllocations[idx] = process.id;
+            } else if (emptySlotIndex !== -1) {
+                updatedAllocations[emptySlotIndex] = process.id;
+            }
+        }
+
+        let outdatedSlots: number[] = [];
+
+        processReference.forEach((process) => {
+            if (process.pages.length === 0) {
+                memoryCopy.forEach((_, idx) => {
+                    if (updatedAllocations[idx] === process.id) {
+                        outdatedSlots.push(idx);
+                    }
+                });
+            }
+        });
+
+        outdatedSlots.forEach(_ =>{
+            const slotIdx = outdatedSlots.shift();
+            if (slotIdx !== undefined) {
+                updatedAllocations[slotIdx] = process.id;
+            }
+        })
+
+        const subMemoryIndexes = memoryCopy
+            .map((_, idx) => updatedAllocations[idx] === process.id ? idx : undefined)
+            .filter((el): el is number => el !== undefined);
+
+        const subMemory = subMemoryIndexes.map(idx => memoryCopy[idx]);
+        
+        if (allocatedFrames > 0) {
+            const newPage = process.pages.shift();
+            if (!newPage) return;
+            
+            pageFaults[i] += subMemory.findIndex(el => el?.address == newPage.address) == -1 ? 1 : 0;
+            const [updatedPages] = LRU(newPage, subMemory, [], indexes[i]);
+
+            subMemoryIndexes.forEach((idx, j) => {
+                memoryCopy[idx] = updatedPages[j];
+                updatedAllocations[idx] = process.id;
+            });
+        } else {
+            throw new Error(`Process ${process.id} has 0 allocated frames and cannot proceed.`);
+        }
     });
+
+    // Tests
+    if(memory.length !== memoryCopy.length) throw new Error("Memory Size Changed!")
+
+    processReference.forEach((process, _) =>{
+        if(process.pages.length > 0 && !updatedAllocations.some(el => el === process.id))
+            throw new Error("Process does not have memory amplified to it!")
+    })
 
     return [memoryCopy, updatedAllocations, pageFaults];
 };

@@ -3,7 +3,7 @@ import { EqualAllocation } from "../../algorithms/FrameAllocationAlgorithms/Equa
 import { PageFaultRateControl } from "../../algorithms/FrameAllocationAlgorithms/PageFaultRateControl"
 import { ProportionalAllocation } from "../../algorithms/FrameAllocationAlgorithms/ProportionalAllocation"
 import { ZoneModelAllocation } from "../../algorithms/FrameAllocationAlgorithms/ZoneModelAllocation"
-import { BASE_LOCALITY_WINDOW_SIZE, BASE_MAX_PROCESS_SIZE, BASE_PAGE_FRAME_COUNT, BASE_PAGE_MAX_COUNT, BASE_PAGE_REFERENCE_LENGTH, BASE_PROCESSES_COUNT, BASE_SIMULATION_SPEED, SLOW_LOCALITY_WINDOW_SIZE, SLOW_MAX_PROCESS_SIZE, SLOW_PAGE_FRAME_COUNT, SLOW_PAGE_MAX_COUNT, SLOW_PAGE_REFERENCE_LENGTH, SLOW_PROCESSES_COUNT, SLOW_SIMULATION_SPEED } from "../../const/pageSettings"
+import { BASE_LOCALITY_WINDOW_SIZE, BASE_MAX_LOCALITY_PAGES, BASE_MAX_PROCESS_SIZE, BASE_MIN_LOCALITY_PAGES, BASE_PAGE_FRAME_COUNT, BASE_PAGE_MAX_COUNT, BASE_PAGE_REFERENCE_LENGTH, BASE_PROCESSES_COUNT, BASE_SIMULATION_SPEED, SLOW_LOCALITY_WINDOW_SIZE, SLOW_MAX_LOCALITY_PAGES, SLOW_MAX_PROCESS_SIZE, SLOW_MIN_LOCALITY_PAGES, SLOW_PAGE_FRAME_COUNT, SLOW_PAGE_MAX_COUNT, SLOW_PAGE_REFERENCE_LENGTH, SLOW_PROCESSES_COUNT, SLOW_SIMULATION_SPEED } from "../../const/pageSettings"
 import { usePageSettings } from "../../contexts/PageSettingsContext"
 import { useSimulation } from "../../contexts/SimulationContext"
 import "./index.css"
@@ -54,8 +54,9 @@ const SettingsContainer =  ({ simulate, reset, simulation } : { simulate: () => 
         setPageReferenceLength(SLOW_PAGE_REFERENCE_LENGTH)
         setLocalityWindowSize(SLOW_LOCALITY_WINDOW_SIZE)
         setSpeed(SLOW_SIMULATION_SPEED)
-        setPageReferenceLength(SLOW_MAX_PROCESS_SIZE)
         setMaxFrameCount(SLOW_PROCESSES_COUNT)
+        setMinLocalPages(SLOW_MIN_LOCALITY_PAGES)
+        setMaxLocalPages(SLOW_MAX_LOCALITY_PAGES)
     }
 
     const setFastAnimation = () =>{
@@ -65,8 +66,9 @@ const SettingsContainer =  ({ simulate, reset, simulation } : { simulate: () => 
         setPageReferenceLength(BASE_PAGE_REFERENCE_LENGTH)
         setLocalityWindowSize(BASE_LOCALITY_WINDOW_SIZE)
         setSpeed(BASE_SIMULATION_SPEED)
-        setPageReferenceLength(BASE_MAX_PROCESS_SIZE)
         setMaxFrameCount(BASE_PROCESSES_COUNT)
+        setMinLocalPages(BASE_MIN_LOCALITY_PAGES)
+        setMaxLocalPages(BASE_MAX_LOCALITY_PAGES)
     }
 
 
@@ -179,7 +181,7 @@ const SettingsContainer =  ({ simulate, reset, simulation } : { simulate: () => 
                         <div className="menu-el-value">{localityWindowSize}</div>
                     </div>
                 </div>
-                <div className="menu-el">
+                <div className="menu-el top">
                     <div className="menu-el-title">Maximum Locality Pages: </div>
                     <div className="menu-el-sub">
                         <input
